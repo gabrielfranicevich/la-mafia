@@ -9,28 +9,28 @@ const GameItem = ({ game, onJoin }) => {
         }
       }}
       disabled={game.status !== 'waiting'}
-      className={`w-full text-left bg-white p-4 rounded-2xl border-2 border-brand-wood shadow-[4px_4px_0px_0px_rgba(93,64,55,0.1)] flex items-center justify-between group transition-all cursor-pointer ${game.status === 'waiting'
-        ? 'hover:border-brand-bronze hover:translate-x-1 focus:border-brand-bronze focus:translate-x-1 focus:outline-none'
-        : 'opacity-70 cursor-not-allowed'
+      className={`w-full text-left p-4 flex items-center justify-between group transition-all duration-300 cursor-pointer ${game.status === 'waiting'
+        ? 'hover:bg-white/5 hover:pl-6 focus:bg-white/5 focus:pl-6 focus:outline-none'
+        : 'opacity-50 cursor-not-allowed'
         }`}
     >
       <div>
-        <h3 className="font-bold text-lg text-brand-wood">{game.name}</h3>
-        <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-brand-wood/60 mt-1">
-          <span className="flex items-center gap-1">
-            <Users size={14} /> {game.players}/{game.maxPlayers === 2 ? '∞' : game.maxPlayers}
+        <h3 className="font-serif font-bold text-lg text-noir-gold tracking-wider group-hover:text-white transition-colors">{game.name}</h3>
+        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-noir-smoke/60 mt-1">
+          <span className="flex items-center gap-2">
+            <Users size={12} /> {game.players}/{game.maxPlayers === 2 ? '∞' : game.maxPlayers}
           </span>
-          <span className="flex items-center gap-1">
-            {game.type === 'chat' ? <MessageSquare size={14} /> : <Users size={14} />}
-            {game.type === 'chat' ? 'Por Chat' : 'En Persona'}
+          <span className="flex items-center gap-2">
+            {game.type === 'chat' ? <MessageSquare size={12} /> : <Users size={12} />}
+            {game.type === 'chat' ? 'CHAT' : 'LIVE'}
           </span>
         </div>
       </div>
-      <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${game.status === 'waiting'
-        ? 'bg-brand-pastel-mint text-brand-wood'
-        : 'bg-brand-wood/10 text-brand-wood/50'
+      <div className={`px-4 py-1 border border-current text-xs font-bold uppercase tracking-[0.2em] transition-all ${game.status === 'waiting'
+        ? 'text-noir-gold border-noir-gold group-hover:bg-noir-gold group-hover:text-noir-bg'
+        : 'text-noir-smoke/30 border-noir-smoke/30'
         }`}>
-        {game.status === 'waiting' ? 'Unirse' : 'Jugando'}
+        {game.status === 'waiting' ? 'JOIN' : 'PLAYING'}
       </div>
     </button>
   );

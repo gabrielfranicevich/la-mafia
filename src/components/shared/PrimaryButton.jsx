@@ -6,7 +6,13 @@ const PrimaryButton = ({ onClick, children, disabled = false, className = '', ti
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`w-full bg-brand-wood text-white py-5 rounded-2xl font-bold text-xl shadow-[4px_4px_0px_0px_#2C1810] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#2C1810] active:translate-y-1 active:shadow-[2px_2px_0px_0px_#2C1810] transition-all flex items-center justify-center gap-3 border-2 border-brand-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0 ${className}`}
+      className={`w-full py-4 px-6 rounded-sm font-serif font-bold tracking-widest uppercase text-lg 
+        bg-noir-surface border border-noir-gold/40 text-noir-gold 
+        shadow-[0_0_15px_rgba(0,0,0,0.7)]
+        hover:bg-noir-gold hover:text-noir-bg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]
+        active:scale-[0.98] transition-all duration-300
+        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-noir-surface disabled:hover:text-noir-gold
+        flex items-center justify-center gap-3 ${className}`}
     >
       {children}
     </button>

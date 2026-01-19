@@ -10,19 +10,20 @@ const StartGameButton = ({ isHost, onStart, playerCount }) => {
   if (!isHost) return null;
 
   return (
-    <div className="mt-auto pt-4">
+    <div className="mt-auto pt-4 border-t border-noir-gold/10">
       <PrimaryButton
         onClick={onStart}
         disabled={!canStart}
         fullWidth
+        className="uppercase tracking-[0.2em]"
       >
         {canStart
-          ? '🎮 Iniciar Juego'
-          : `⏳ Esperando jugadores (${playerCount}/4 mínimo)`}
+          ? 'Initiate Contract'
+          : `Waiting for Operatives (${playerCount}/4)`}
       </PrimaryButton>
       {!canStart && (
-        <p className="text-center text-xs text-brand-wood/60 mt-2">
-          Se necesitan al menos 4 jugadores para jugar
+        <p className="text-center text-[10px] text-noir-smoke/40 mt-3 uppercase tracking-widest">
+          Minimum 4 players required to start operation
         </p>
       )}
     </div>

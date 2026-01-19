@@ -30,43 +30,43 @@ const RoleSelector = ({
     <div className="mb-6">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 bg-white rounded-2xl hover:bg-brand-beige/20 transition-all border-2 border-brand-wood shadow-[4px_4px_0px_0px_rgba(93,64,55,1)] active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(93,64,55,1)]"
+        className="w-full flex items-center justify-between p-4 border-b border-noir-gold/20 hover:bg-white/5 transition-all group"
       >
-        <div className="flex items-center gap-3">
-          <div className="bg-brand-pastel-mint p-2 rounded-lg text-brand-wood">
+        <div className="flex items-center gap-4">
+          <div className="text-noir-gold group-hover:scale-110 transition-transform duration-300">
             <Users size={20} />
           </div>
           <div className="text-left">
-            <h2 className="text-lg font-bold text-brand-wood leading-tight">Roles</h2>
-            <span className="text-xs text-brand-wood/70 font-bold uppercase tracking-wide">
-              {assignedRoles}/{totalPlayers} asignados
-              {civilsNeeded > 0 && ` (+${civilsNeeded} civiles)`}
+            <h2 className="text-lg font-serif font-bold text-noir-gold leading-tight tracking-widest">ROLES</h2>
+            <span className="text-xs text-noir-smoke font-bold uppercase tracking-wide">
+              {assignedRoles}/{totalPlayers} ASSIGNED
+              {civilsNeeded > 0 && ` (+${civilsNeeded} CIVS)`}
             </span>
           </div>
         </div>
-        {expanded ? <ChevronUp size={24} className="text-brand-wood" /> : <ChevronDown size={24} className="text-brand-wood" />}
+        {expanded ? <ChevronUp size={20} className="text-noir-gold/50" /> : <ChevronDown size={20} className="text-noir-gold/50" />}
       </button>
 
       {expanded && (
-        <div className="mt-4 p-4 bg-brand-wood/5 rounded-2xl border-2 border-brand-wood/10 border-dashed">
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300 py-4">
           {/* Validación */}
           {!isValid && (
-            <div className="mb-4 p-3 bg-red-100 border-2 border-red-500 rounded-xl text-red-800 text-sm font-bold">
-              ⚠️ Debe haber más civiles que mafias con capacidad de voto
+            <div className="mb-4 p-3 border border-red-500/50 bg-red-900/20 rounded-sm text-red-200 text-xs font-bold tracking-wider">
+              ⚠️ MORE CIVILIANS THAN MAFIA REQUIRED
             </div>
           )}
 
           {/* Civiles automáticos */}
           {civilsNeeded > 0 && (
-            <div className="mb-4 p-3 bg-blue-100 border-2 border-blue-300 rounded-xl">
-              <div className="text-sm font-bold text-blue-800">
-                👤 Se añadirá{civilsNeeded > 1 ? 'n' : ''}: {civilsNeeded} Civil{civilsNeeded > 1 ? 'es' : ''} normal{civilsNeeded > 1 ? 'es' : ''}
+            <div className="mb-4 p-3 border border-noir-gold/30 bg-noir-gold/5 rounded-sm">
+              <div className="text-xs font-bold text-noir-gold tracking-wider">
+                👤 AUTO-ADDED: {civilsNeeded} CIVILIAN{civilsNeeded > 1 ? 'S' : ''}
               </div>
             </div>
           )}
 
           {/* Roles List */}
-          <div className="space-y-2 mt-4">
+          <div className="space-y-3 mt-4">
             {Object.values(ROLES)
               .filter(r => r.id !== 'civil')
               .sort((a, b) => {
@@ -88,8 +88,8 @@ const RoleSelector = ({
           </div>
 
           {!isHost && (
-            <div className="text-center text-xs text-brand-wood/60 font-bold mt-3 italic">
-              Solo el anfitrión puede configurar los roles
+            <div className="text-center text-xs text-noir-smoke/40 font-bold mt-4 italic tracking-widest">
+              WAITING FOR HOST CONFIGURATION...
             </div>
           )}
         </div>
@@ -103,27 +103,27 @@ const RoleSelector = ({
  */
 const RoleItem = ({ role, count, onIncrement, onDecrement, disabled, isMaxReached, canDecrement }) => {
   return (
-    <div className="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-brand-wood/20">
-      <div className="text-2xl">{role.emoji}</div>
+    <div className="flex items-center gap-3 p-3 border border-noir-gold/10 hover:border-noir-gold/30 transition-colors bg-black/20">
+      <div className="text-2xl filter grayscale opacity-80">{role.emoji}</div>
       <div className="flex-1 min-w-0">
-        <div className="font-bold text-brand-wood text-sm">{role.name}</div>
-        <div className="text-xs text-brand-wood/60 truncate">{role.description}</div>
+        <div className="font-serif font-bold text-noir-gold text-sm tracking-wider">{role.name}</div>
+        <div className="text-xs text-noir-smoke/60 truncate font-sans">{role.description}</div>
       </div>
       <div className="flex items-center gap-2">
         <button
           onClick={onDecrement}
           disabled={!canDecrement || disabled}
-          className="w-8 h-8 rounded-lg bg-brand-pastel-peach border-2 border-brand-wood text-brand-wood font-bold hover:brightness-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-[2px_2px_0px_0px_rgba(93,64,55,1)] active:translate-y-0.5 active:shadow-none flex items-center justify-center"
+          className="w-8 h-8 flex items-center justify-center border border-noir-gold/30 text-noir-gold hover:bg-noir-gold hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <Minus size={16} />
+          <Minus size={14} />
         </button>
-        <div className="w-8 text-center font-bold text-brand-wood">{count}</div>
+        <div className="w-8 text-center font-bold text-noir-gold text-lg font-serif">{count}</div>
         <button
           onClick={onIncrement}
           disabled={disabled || isMaxReached}
-          className="w-8 h-8 rounded-lg bg-brand-pastel-mint border-2 border-brand-wood text-brand-wood font-bold hover:brightness-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-[2px_2px_0px_0px_rgba(93,64,55,1)] active:translate-y-0.5 active:shadow-none flex items-center justify-center"
+          className="w-8 h-8 flex items-center justify-center border border-noir-gold/30 text-noir-gold hover:bg-noir-gold hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <Plus size={16} />
+          <Plus size={14} />
         </button>
       </div>
     </div>

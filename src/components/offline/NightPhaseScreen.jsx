@@ -33,7 +33,10 @@ const NightPhaseScreen = ({
   const roleId = getCurrentNightRole();
   const role = ROLES[roleId];
 
-  // Minimum time timer
+  // Timer constants
+  const MIN_TIME = 7;
+  const MAX_TIME = 30;
+
   useEffect(() => {
     // Reset state on new player
     setSelectedTargets([]);
@@ -42,12 +45,12 @@ const NightPhaseScreen = ({
 
     if (isTurnStarted) {
       setCanContinue(false);
-      setTimeRemaining(7);
+      setTimeRemaining(MIN_TIME);
 
-      const timer = setInterval(() => {
+      const minTimer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
-            clearInterval(timer);
+            clearInterval(minTimer);
             setCanContinue(true);
             return 0;
           }
@@ -55,7 +58,24 @@ const NightPhaseScreen = ({
         });
       }, 1000);
 
-      return () => clearInterval(timer);
+      // Max Timer (only if role has action)
+      let maxTimer = null;
+      if (role?.nightAction) {
+        // We use a separate state or just reuse timeRemaining semantics?
+        // Let's us a completely separate timeout for the "Max Limit" to force end.
+        // Or better, let's show a separate countdown if we want to show it.
+        // For simplicity, let's just trigger the 'timeout' after MAX_TIME seconds.
+        maxTimer = setTimeout(() => {
+          // Force submit no action
+          submitNightAction({ type: 'no_action' });
+          setIsTurnStarted(false);
+        }, MAX_TIME * 1000);
+      }
+
+      return () => {
+        clearInterval(minTimer);
+        if (maxTimer) clearTimeout(maxTimer);
+      };
     }
   }, [isTurnStarted, role, currentNightPlayer]);
 
@@ -88,16 +108,23 @@ const NightPhaseScreen = ({
 
     // Special handling for Police
     if (role.nightAction === 'investigate') {
-      const targetId = selectedTargets[0];
-      const targetRoleId = gameData.roles[targetId];
-      const targetRole = ROLES[targetRoleId];
-      const isBad = targetRole.detectsAsBad;
+      // If Trabajadora exists in the game (alive or dead), result is delayed to morning report
+      const trabajadoraExists = Object.values(gameData.roles).some(rId => rId === 'trabajadora');
 
-      setInvestigationResult({
-        name: gameData.players[targetId],
-        isBad
-      });
-      return; // Don't submit yet, wait for user to close result
+      if (!trabajadoraExists) {
+        const targetId = selectedTargets[0];
+        const targetRoleId = gameData.roles[targetId];
+        const targetRole = ROLES[targetRoleId];
+        const isBad = targetRole.detectsAsBad;
+
+        setInvestigationResult({
+          name: gameData.players[targetId],
+          isBad
+        });
+        return; // Don't submit yet, wait for user to close result
+      }
+      // If trabajadora exists, fall through to standard submission
+      // The result will be calculated in useOfflineGameplay and shown in morning report
     }
 
     // Submit Action

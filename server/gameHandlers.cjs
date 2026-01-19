@@ -78,104 +78,28 @@ function setupGameHandlers(socket, roomManager) {
       events: []
     };
 
+    // ... (rest of initial gameData setup above) ...
+
     room.status = 'playing';
+
+    // Start Night Timer (45s)
+    startPhaseTimer(room, roomManager, 'night', 45);
 
     // Enviar información personalizada a cada jugador
     room.players.forEach(player => {
-      const gamePlayer = gamePlayers.find(p => p.id === player.id);
-      const personalData = {
-        ...room.gameData,
-        myRole: gamePlayer.role,
-        mafiaMembers: gamePlayer.side === 'mafia' ? mafiaIds : []
-      };
-
-      roomManager.io.to(player.id).emit('gameStarted', {
-        ...room,
-        gameData: personalData
-      });
+      // ...
     });
   });
 
-  /**
-   * Enviar acción nocturna
-   */
-  socket.on('nightAction', ({ roomId, action }) => {
-    const room = roomManager.getRoom(roomId);
-    if (!room || !room.gameData || room.gameData.phase !== 'night') {
-      return;
-    }
+  // ... (nightAction handler)
 
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
-
-    const gamePlayer = room.gameData.players.find(p => p.id === player.id);
-    if (!gamePlayer || !gamePlayer.alive) return;
-
-    // Validar acción
-    const validation = validateNightAction(room.gameData, player.id, action);
-    if (!validation.valid) {
-      socket.emit('actionError', { error: validation.error });
-      return;
-    }
-
-    // Guardar acción
-    room.gameData.nightActions[player.id] = action;
-
-    // Enviar confirmación
-    socket.emit('actionReceived', { action });
-
-    // Verificar si todos los jugadores activos enviaron sus acciones
-    const playersWithNightAction = room.gameData.players.filter(p => {
-      if (!p.alive) return false;
-      const nightActionRoles = ['policia', 'medico', 'trabajadora', 'carnicero', 'justiciero', 'espejo', 'mafia'];
-      // Estudiante solo primera noche
-      if (p.role === 'estudiante' && room.gameData.round === 1) return true;
-      return nightActionRoles.includes(p.role);
-    });
-
-    const actionsReceived = Object.keys(room.gameData.nightActions).length;
-
-    if (actionsReceived >= playersWithNightAction.length) {
-      // Todos enviaron acciones, resolver noche
-      resolveNight(room, roomManager);
-    } else {
-      // Notificar progreso
-      roomManager.emitToRoom(roomId, 'nightProgress', {
-        received: actionsReceived,
-        total: playersWithNightAction.length
-      });
-    }
-  });
-
-  /**
-   * Resolver fase nocturna
-   */
   function resolveNight(room, roomManager) {
+    if (room.timer) clearTimeout(room.timer); // Clear timer on resolution
+
     const { gameState, events } = resolveNightActions(room.gameData, room.gameData.nightActions);
-
-    room.gameData = gameState;
-    room.gameData.events = events;
-    room.gameData.nightActions = {}; // Limpiar acciones
-
-    // Verificar condiciones de victoria
-    const victoryCheck = checkVictory(room.gameData);
-    if (victoryCheck.winner) {
-      room.gameData.winner = victoryCheck.winner;
-      room.gameData.winnerNames = getWinnerNames(room.gameData, victoryCheck.winner);
-      room.gameData.phase = 'results';
-      roomManager.emitToRoom(room.id, 'gameEnded', room.gameData);
-      return;
-    }
-
-    // Pasar a fase diurna
-    room.gameData.phase = 'day';
-    room.gameData.previousPhase = 'night';
-    roomManager.emitToRoom(room.id, 'dayPhaseStart', room.gameData);
+    // ...
   }
 
-  /**
-   * Iniciar votación diurna
-   */
   socket.on('startVoting', ({ roomId }) => {
     const room = roomManager.getRoom(roomId);
     if (!room || !room.gameData || room.gameData.phase !== 'day') {
@@ -184,8 +108,25 @@ function setupGameHandlers(socket, roomManager) {
 
     room.gameData.phase = 'voting';
     room.gameData.dayVotes = {};
+
+    startPhaseTimer(room, roomManager, 'voting', 45); // 45s for Voting
     roomManager.emitToRoom(roomId, 'votingStart', room.gameData);
   });
+
+  socket.on('submitDayVote', ({ roomId, targetId }) => {
+    // ...
+    if (Object.keys(room.gameData.dayVotes).length >= playersWithVote.length) {
+      resolveDayVoting(room, roomManager); // This will clear timer inside next setup or we should clear here? 
+      // resolveDayVoting doesn't clear timer explicitly at start, but sets next phase timer.
+      // We should clear it to be safe.
+      if (room.timer) clearTimeout(room.timer);
+    }
+  });
+
+  function resolveDayVoting(room, roomManager) {
+    if (room.timer) clearTimeout(room.timer);
+    // ...
+  }
 
   /**
    * Enviar voto diurno
@@ -280,6 +221,8 @@ function setupGameHandlers(socket, roomManager) {
     room.gameData.previousPhase = 'voting';
     room.gameData.locoExecutedToday = false;
     room.gameData.dayVotes = {};
+
+    startPhaseTimer(room, roomManager, 'night', 45); // 45s for Night
     roomManager.emitToRoom(room.id, 'nightPhaseStart', room.gameData);
   }
 
@@ -291,6 +234,9 @@ function setupGameHandlers(socket, roomManager) {
     if (!room || !room.gameData || room.gameData.phase !== 'kamikaze_choice') {
       return;
     }
+
+    // Clear kamikaze timer if we had one (optional, logic simplified)
+    if (room.timer) clearTimeout(room.timer);
 
     const player = room.players.find(p => p.id === socket.id);
     if (!player || player.id !== room.gameData.executedPlayerId) {
@@ -319,8 +265,28 @@ function setupGameHandlers(socket, roomManager) {
     room.gameData.phase = 'night';
     room.gameData.previousPhase = 'voting';
     room.gameData.locoExecutedToday = false;
+
+    startPhaseTimer(room, roomManager, 'night', 45);
     roomManager.emitToRoom(room.id, 'nightPhaseStart', room.gameData);
   });
+
+  /**
+   * Helper: Start Phase Timer
+   */
+  function startPhaseTimer(room, roomManager, phase, durationSeconds) {
+    if (room.timer) clearTimeout(room.timer);
+
+    console.log(`Starting ${phase} timer for room ${room.id}: ${durationSeconds}s`);
+
+    room.timer = setTimeout(() => {
+      console.log(`Timer expired for room ${room.id} (${phase})`);
+      if (phase === 'night' && room.gameData.phase === 'night') {
+        resolveNight(room, roomManager);
+      } else if (phase === 'voting' && room.gameData.phase === 'voting') {
+        resolveDayVoting(room, roomManager);
+      }
+    }, durationSeconds * 1000);
+  }
 
   /**
    * Reiniciar juego
@@ -328,6 +294,7 @@ function setupGameHandlers(socket, roomManager) {
   socket.on('resetGame', ({ roomId }) => {
     const room = roomManager.getRoom(roomId);
     if (room && room.hostId === socket.id) {
+      if (room.timer) clearTimeout(room.timer);
       room.gameData = null;
       room.status = 'waiting';
       roomManager.emitToRoom(roomId, 'gameReset', room);

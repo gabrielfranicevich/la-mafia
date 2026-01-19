@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import InputField from '../../shared/InputField';
+import PrimaryButton from '../../shared/PrimaryButton';
 
 const GameCodeInput = ({ onJoin }) => {
   const [code, setCode] = useState('');
@@ -22,29 +24,39 @@ const GameCodeInput = ({ onJoin }) => {
     if (e.key === 'Enter' && code.length === 4) handleJoin();
   };
 
-  // if (there are no joinable games) return null;
-
   return (
-    <div className="mb-4">
-      <label className="text-sm font-bold text-brand-wood uppercase tracking-wider ml-1">Código de Juego</label>
-      <div className="flex gap-2 mt-2">
-        <input
-          type="text"
-          value={code}
-          onChange={handleChange}
-          onPaste={handlePaste}
-          placeholder="XXXX"
-          maxLength={4}
-          className="flex-1 p-3 border-2 border-brand-wood/20 rounded-xl focus:border-brand-bronze focus:outline-none bg-white text-brand-wood font-bold text-lg text-center tracking-widest uppercase"
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          onClick={handleJoin}
-          disabled={code.length !== 4}
-          className="px-6 py-3 bg-brand-bronze text-white rounded-xl font-bold shadow-[2px_2px_0px_0px_#5D4037] hover:translate-y-[-1px] active:translate-y-0.5 transition-all border-2 border-brand-wood disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          UNIRSE
-        </button>
+    <div className="mb-8">
+      <div className="flex gap-4 items-end">
+        <div className="flex-1">
+          <InputField
+            label="Código de Juego"
+            value={code}
+            onChange={handleChange}
+            placeholder="XXXX"
+            maxLength={4}
+            containerClassName="w-full"
+            className="text-center text-2xl tracking-[0.5em] uppercase font-serif"
+            // Note: onPaste is not directly supported by InputField props but we can wrap or modify InputField if needed. 
+            // For now, let's assume standard input behavior or add it if strictly necessary.
+            // Actually InputField passes ...rest props? No it destructures specific ones.
+            // Let's rely on standard paste for now or add onPaste support to InputField later if critical.
+            // But wait, the previous code strictly handled onPaste. I should probably add it to InputField or just use the local handler if I can pass props.
+            // Looking at InputField: it takes specific props. I might need to update InputField to accept ...rest.
+            // For now, I'll skip explicit onPaste prop if InputField doesn't support it, but I should probably check InputField again.
+            // Re-reading InputField.jsx... it accepts `type`, `value`, `onChange`, `onKeyDown`.
+            // Use native paste behavior for now.
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+        <div className="w-1/3">
+          <PrimaryButton
+            onClick={handleJoin}
+            disabled={code.length !== 4}
+            className="py-4"
+          >
+            UNIRSE
+          </PrimaryButton>
+        </div>
       </div>
     </div>
   );

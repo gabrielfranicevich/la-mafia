@@ -52,8 +52,8 @@ const OnlineLobbyScreen = ({ setScreen, onlineGames = [], lanGames = [],
 
 
   return (
-    <div className="p-6 relative z-10 h-full flex flex-col">
-      <div className="relative mb-6 flex items-center justify-center">
+    <div className="p-6 relative z-10 h-full flex flex-col max-w-2xl mx-auto w-full">
+      <div className="relative mb-8 flex items-center justify-center border-b border-noir-gold/20 pb-4">
         <button
           onClick={() => {
             if (showDirectJoin) {
@@ -67,13 +67,13 @@ const OnlineLobbyScreen = ({ setScreen, onlineGames = [], lanGames = [],
               window.history.pushState(null, '', '/');
             }
           }}
-          className="absolute left-0 p-2 rounded-xl hover:bg-brand-wood/10 text-brand-wood transition-all active:scale-95"
-          title="Volver al inicio"
+          className="absolute left-0 p-2 text-noir-gold hover:text-white transition-colors"
+          title="BACK"
         >
-          <ArrowLeft size={28} />
+          <ArrowLeft size={24} />
         </button>
-        <h1 className="text-3xl font-bold text-brand-wood tracking-wider drop-shadow-sm">
-          {showDirectJoin ? 'UNIRSE A PARTIDA' : 'PARTIDAS ONLINE'}
+        <h1 className="text-2xl font-serif font-bold text-noir-gold tracking-[0.2em] text-glow">
+          {showDirectJoin ? 'JOIN ROOM' : 'LOBBY'}
         </h1>
       </div>
 
@@ -91,27 +91,27 @@ const OnlineLobbyScreen = ({ setScreen, onlineGames = [], lanGames = [],
         </div>
       ) : (
         <>
-          {/* Game Code Input - Fixed at top, always visible */}
+          {/* Game Code Input */}
           <GameCodeInput onJoin={setSelectedRoomId} />
 
           {/* Scrollable game lists */}
-          <div className="flex-1 mb-6 overflow-y-auto">
+          <div className="flex-1 mb-6 overflow-y-auto px-1 scrollbar-thin scrollbar-thumb-noir-gold/50 scrollbar-track-transparent">
             {/* LAN Games Section */}
             <GameListSection
-              title="Partidas LAN Disponibles"
-              subtitle={`${safeLanGames.length} partida${safeLanGames.length !== 1 ? 's' : ''} en tu red`}
-              icon={<Users size={20} />}
+              title="LAN NET"
+              subtitle={`${safeLanGames.length} AVAILABLE`}
+              icon={<Users size={16} />}
               games={safeLanGames}
               isExpanded={lanGamesExpanded}
               onToggle={() => setLanGamesExpanded(!lanGamesExpanded)}
               onJoin={setSelectedRoomId}
-              headerClassName="bg-brand-pastel-mint"
+              headerClassName=""
             />
 
             {/* All Online Games Section */}
             <GameListSection
-              title="Partidas Disponibles"
-              icon={<Users size={20} />}
+              title="ONLINE"
+              icon={<Users size={16} />}
               games={safeOnlineGames}
               isExpanded={onlineGamesExpanded}
               onToggle={() => setOnlineGamesExpanded(!onlineGamesExpanded)}
@@ -121,12 +121,10 @@ const OnlineLobbyScreen = ({ setScreen, onlineGames = [], lanGames = [],
 
           <button
             onClick={() => setScreen('online_create')}
-            className="w-full bg-brand-wood text-white py-5 rounded-2xl font-bold text-xl shadow-[4px_4px_0px_0px_#2C1810] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#2C1810] active:translate-y-1 active:shadow-[2px_2px_0px_0px_#2C1810] transition-all flex items-center justify-center gap-3 border-2 border-brand-dark"
+            className="w-full py-4 border border-noir-gold/50 text-noir-gold font-serif font-bold tracking-[0.2em] hover:bg-noir-gold hover:text-noir-bg transition-all duration-300 uppercase flex items-center justify-center gap-4 bg-black/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
           >
-            <div className="bg-white/20 p-1 rounded-lg">
-              <Users size={24} />
-            </div>
-            CREAR PARTIDA
+            <Users size={20} />
+            CREATE ROOM
           </button>
         </>
       )}

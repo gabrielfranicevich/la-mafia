@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Vote } from '../../Icons';
 
 /**
@@ -7,6 +7,20 @@ import { Vote } from '../../Icons';
  */
 const DayVotingScreen = ({ gameData, myPlayerId, onSubmitVote }) => {
   const [selectedTarget, setSelectedTarget] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(45);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 0) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
   const myPlayer = gameData.players.find(p => p.id === myPlayerId);
   const canVote = myPlayer?.alive && !myPlayer.mutations?.includes('hand');
 
@@ -26,6 +40,9 @@ const DayVotingScreen = ({ gameData, myPlayerId, onSubmitVote }) => {
           <Vote className="mx-auto mb-3 text-amber-700" size={48} />
           <h1 className="text-3xl font-bold text-amber-900 mb-2">⚖️ Votación</h1>
           <p className="text-amber-700">Vota para ejecutar a un jugador</p>
+          <div className="mt-2 text-amber-800 font-mono text-xl">
+            Tiempo restante: {timeLeft}s
+          </div>
         </div>
 
         {canVote ? (

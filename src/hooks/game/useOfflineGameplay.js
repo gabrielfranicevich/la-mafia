@@ -149,13 +149,43 @@ export const useOfflineGameplay = (setScreen, setupData) => {
       }
     });
 
-    // 4. Kills
+    // 4. Investigations (Processed here to handle redirect/block logic for day report)
+    // Find Police actions from original actions list
+    const policeActions = actions.filter(a => a.type === 'investigate');
+
+    policeActions.forEach(action => {
+      // Check if blocked
+      const isBlocked = blockedPlayers.has(action.playerIndex);
+
+      // Calculate real target (redirected)
+      const realTarget = getTarget(action.target);
+      const targetRole = ROLES[gameData.roles[realTarget]];
+
+      let isBad = targetRole.detectsAsBad;
+
+      // Inversion Logic: If blocked by Trabajadora, result is inverted
+      if (isBlocked) {
+        isBad = !isBad;
+      }
+
+      // Add event for Day Report
+      // Note: In offline mode, events are public. To prevent revealing WHICH player is the police,
+      // we might want to mask it? But offline play usually involves the app announcing "The Police suspected..."
+      // The user requirement implies a public announcement: "el policía sospechó que alguien es bueno/malo"
+      events.push({
+        type: 'investigate',
+        message: `El Policía sospechó que ${gameData.players[realTarget]} es ${isBad ? 'CULPABLE (Malo)' : 'INOCENTE (Bueno)'}.`
+      });
+    });
+
+    // 5. Kills
     const mafiaVotes = {};
     const justicieroVotes = {};
 
     validActions.forEach(action => {
       const actorRole = ROLES[gameData.roles[action.playerIndex]];
 
+      // Skip generate kill votes for blocked players (already handled by validActions filter, but good to be safe)
       if (action.type === 'kill_group' || action.type === 'kill_direct') {
         // Votes target the *redirected* player
         const realTarget = getTarget(action.target);
@@ -187,7 +217,6 @@ export const useOfflineGameplay = (setScreen, setupData) => {
 
     const tryKill = (targetId) => {
       if (targetId === null) return;
-      if (targetId === null) return;
 
       // Overdose Check: If protected by >= 2 doctors, they die regarldess of protection.
       // We handle this separately below, but for "Attacks", standard protection applies.
@@ -206,7 +235,6 @@ export const useOfflineGameplay = (setScreen, setupData) => {
     };
 
     if (mafiaTarget !== null) tryKill(mafiaTarget);
-    if (mafiaTarget !== null) tryKill(mafiaTarget);
     if (justicieroTarget !== null) tryKill(justicieroTarget);
 
     // Overdose Deaths (Medic >= 2)
@@ -222,11 +250,13 @@ export const useOfflineGameplay = (setScreen, setupData) => {
       }
     });
 
-    // 5. Mutilations
+    // 6. Mutilations
     validActions.filter(a => a.type === 'mutilate').forEach(action => {
       const targetId = getTarget(action.target);
 
-      if (protectedPlayers.has(targetId)) {
+      if (protectedPlayers.has(targetId) && (protectionCounts[targetId] || 0) < 2) { // Ensure overprotected logic doesn't conflict? 
+        // Logic: if protected (by <2 medics or standard protection), mutilation is prevented.
+        // If overdose (>=2), they die anyway, so prevention message is moot but technically correct.
         events.push({ type: 'info', message: 'Un intento de mutilación fue prevenido.' });
         return;
       }

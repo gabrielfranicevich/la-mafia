@@ -13,6 +13,20 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [selectedTargets, setSelectedTargets] = useState([]); // Para Espejo (2 targets)
   const [mutationType, setMutationType] = useState('hand');
+  const [timeLeft, setTimeLeft] = useState(45);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 0) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   if (!myPlayer || !myPlayer.alive) {
     return (
@@ -96,6 +110,9 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
         <div className="text-center mb-6">
           <Moon className="mx-auto mb-3 text-night-moonlight drop-shadow-lg" size={48} />
           <h1 className="text-3xl font-bold text-night-moonlight mb-2">🌙 Noche - Ronda {gameData.round}</h1>
+          <div className="mb-2 text-night-moonlight/80 font-mono text-xl">
+            Tiempo restante: {timeLeft}s
+          </div>
           <div className="inline-block px-4 py-2 bg-night-deep/70 border-2 border-night-moonlight/30 rounded-xl shadow-lg">
             <span className="text-2xl mr-2">{myRole.emoji}</span>
             <span className="text-lg font-bold text-night-moonlight">{myRole.name}</span>
