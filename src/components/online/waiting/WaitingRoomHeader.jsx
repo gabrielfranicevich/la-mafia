@@ -36,7 +36,7 @@ const WaitingRoomHeader = ({ roomName, roomId, onLeave }) => {
           <ArrowLeft size={24} />
         </button>
         <div className="text-center">
-          <h1 className="text-sm font-bold text-noir-gold/50 uppercase tracking-[0.4em] mb-1">ROOM</h1>
+          <h1 className="text-sm font-bold text-noir-gold/50 uppercase tracking-[0.4em] mb-1">SALA</h1>
           <h2 className="text-3xl font-serif font-bold text-noir-gold tracking-widest text-glow">{roomName}</h2>
         </div>
       </div>
@@ -44,7 +44,7 @@ const WaitingRoomHeader = ({ roomName, roomId, onLeave }) => {
       <div className="bg-white/5 p-6 rounded-sm border border-noir-gold/20 mb-6 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-noir-smoke uppercase tracking-[0.2em]">ACCESS CODE</span>
+            <span className="text-xs font-bold text-noir-smoke uppercase tracking-[0.2em]">CÓDIGO</span>
             <div className="text-4xl font-serif font-bold text-noir-gold tracking-[0.5em] mt-2 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">{roomId}</div>
           </div>
           <button

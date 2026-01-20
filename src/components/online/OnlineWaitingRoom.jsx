@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import WaitingRoomHeader from './waiting/WaitingRoomHeader';
 import RoomStats from './waiting/RoomStats';
+import GameTypeToggle from './waiting/GameTypeToggle';
 import GameSettingsSection from './waiting/GameSettingsSection';
 import WaitingPlayerList from './waiting/WaitingPlayerList';
 import StartGameButton from './waiting/StartGameButton';
@@ -34,19 +35,30 @@ const OnlineWaitingRoom = ({
   const updateRole = (roleId, count) => {
     if (!isHost) return;
 
+    // Ensure at least 1 mafia
+    if (roleId === 'mafia' && count < 1) {
+      return;
+    }
+
     const newRoles = {
       ...selectedRoles,
       [roleId]: count
     };
 
-    // Limpiar roles con count = 0
+    // Limpiar roles con count = 0 (excepto mafia)
     Object.keys(newRoles).forEach(key => {
-      if (newRoles[key] === 0) {
+      if (newRoles[key] === 0 && key !== 'mafia') {
         delete newRoles[key];
       }
     });
 
     updateRoomSettings({ selectedRoles: newRoles });
+  };
+
+  // Actualizar tipo de juego
+  const updateGameType = (type) => {
+    if (!isHost) return;
+    updateRoomSettings({ type });
   };
 
   return (
@@ -61,6 +73,12 @@ const OnlineWaitingRoom = ({
         currentPlayers={currentPlayers}
         maxPlayers={roomData.settings.players}
         gameType={roomData.settings.type}
+      />
+
+      <GameTypeToggle
+        isHost={isHost}
+        currentType={roomData.settings.type}
+        onUpdateType={updateGameType}
       />
 
       <GameSettingsSection

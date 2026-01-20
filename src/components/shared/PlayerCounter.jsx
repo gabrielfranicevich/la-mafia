@@ -14,7 +14,7 @@ const PlayerCounter = ({
   onToggleExpand,
   showMax = false // Show MAX MONOS text
 }) => {
-  const displayCount = count === '∞' ? '∞' : count;
+  const displayCount = count === 0 ? '∞' : count;
   const isMin = count <= min;
   const isMax = count >= max;
 
@@ -23,22 +23,22 @@ const PlayerCounter = ({
       <button
         onClick={onDecrement}
         disabled={isMin}
-        className="w-12 h-12 rounded-xl bg-brand-pastel-peach border-2 border-brand-wood text-brand-wood font-bold text-2xl hover:brightness-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0px_0px_rgba(93,64,55,1)] active:translate-y-0.5 active:shadow-none flex items-center justify-center"
+        className="w-12 h-12 flex items-center justify-center border border-noir-gold/30 text-noir-gold hover:bg-noir-gold hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed"
       >
         -
       </button>
       <div className="flex-1 text-center">
-        <div className="text-5xl font-bold text-brand-wood">{displayCount}</div>
+        <div className="text-5xl font-serif font-bold text-noir-gold">{displayCount}</div>
         {showMax && typeof max === 'number' && (
-          <div className="text-xs font-bold uppercase text-brand-wood/50 tracking-widest mt-1">
-            MAX MONOS: {Math.ceil(count / 2) - 1} {/* Logic specific to Mono game, maybe should be passed as prop but keeping simple for now */}
+          <div className="text-xs font-bold uppercase text-noir-smoke tracking-widest mt-1">
+            MÁX MAFIA: {Math.ceil(count / 2) - 1}
           </div>
         )}
       </div>
       <button
         onClick={onIncrement}
         disabled={isMax}
-        className="w-12 h-12 rounded-xl bg-brand-pastel-mint border-2 border-brand-wood text-brand-wood font-bold text-2xl hover:brightness-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[2px_2px_0px_0px_rgba(93,64,55,1)] active:translate-y-0.5 active:shadow-none flex items-center justify-center"
+        className="w-12 h-12 flex items-center justify-center border border-noir-gold/30 text-noir-gold hover:bg-noir-gold hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed"
       >
         +
       </button>
@@ -47,7 +47,7 @@ const PlayerCounter = ({
 
   if (!accordion) {
     return (
-      <div className="bg-white p-2 rounded-2xl border-2 border-brand-wood/20">
+      <div className="bg-black/20 p-2 border border-noir-gold/20">
         <CounterControls />
       </div>
     );
@@ -57,21 +57,22 @@ const PlayerCounter = ({
     <div className="mb-6">
       <button
         onClick={onToggleExpand}
-        className="w-full flex items-center justify-between p-4 bg-white rounded-2xl hover:bg-brand-beige/20 transition-all border-2 border-brand-wood shadow-[4px_4px_0px_0px_rgba(93,64,55,1)] active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(93,64,55,1)]"
+        className="w-full flex items-center justify-between p-4 border-b border-noir-gold/20 hover:bg-white/5 transition-all group"
       >
-        <div className="flex items-center gap-3">
-          <div className="bg-brand-pastel-mint p-2 rounded-lg text-brand-wood">
+        <div className="flex items-center gap-4">
+          <div className="text-noir-gold group-hover:scale-110 transition-transform duration-300">
             <Users size={20} />
           </div>
           <div className="text-left">
-            <h2 className="text-lg font-bold text-brand-wood leading-tight">{label}</h2>
-            <span className="text-xs text-brand-wood/70 font-bold uppercase tracking-wide">{subLabel || `${count} personas`}</span>
+            <h2 className="text-lg font-serif font-bold text-noir-gold leading-tight tracking-widest uppercase">{label}</h2>
+            <span className="text-xs text-noir-smoke font-bold uppercase tracking-wide">{subLabel || `${count} PERSONAS`}</span>
           </div>
         </div>
-        {expanded ? <ChevronUp size={24} className="text-brand-wood" /> : <ChevronDown size={24} className="text-brand-wood" />}
+        {expanded ? <ChevronUp size={20} className="text-noir-gold/50" /> : <ChevronDown size={20} className="text-noir-gold/50" />}
       </button>
+
       {expanded && (
-        <div className="mt-4 p-4 bg-brand-wood/5 rounded-2xl border-2 border-brand-wood/10 border-dashed">
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300 py-4">
           <CounterControls />
         </div>
       )}

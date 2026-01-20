@@ -46,7 +46,8 @@ function getIpSubnet(ip) {
  */
 function sanitizeName(name) {
   if (!name) return 'Jugador';
-  return name.replace(/[^\w\s]/gi, '').substring(0, 30).trim() || 'Jugador';
+  // Use Unicode property escapes (\p{L}) to allow any letter from any language
+  return name.replace(/[^\p{L}\p{N}\s_]/gu, '').substring(0, 30).trim() || 'Jugador';
 }
 
 /**

@@ -46,7 +46,7 @@ export const TIMERS = {
   },
   // Modo offline - tiempos mínimos (ocultar identidad)
   OFFLINE: {
-    MIN_TURN_DELAY: 7,     // 3 segundos mínimo por turno
+    MIN_TURN_DELAY: 3,     // 3 segundos mínimo por turno
     REVEAL_DELAY: 2        // 2 segundos para revelar información
   }
 };

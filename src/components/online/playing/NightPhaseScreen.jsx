@@ -30,11 +30,11 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
 
   if (!myPlayer || !myPlayer.alive) {
     return (
-      <div className="min-h-screen bg-night-gradient flex items-center justify-center p-4">
+      <div className="min-h-screen bg-noir-bg flex items-center justify-center p-4">
         <div className="text-center">
-          <Moon className="mx-auto mb-4 text-night-moonlight drop-shadow-lg" size={64} />
-          <h2 className="text-2xl font-bold text-night-moonlight mb-2">Estás Muerto</h2>
-          <p className="text-night-moonlight/70">Observa cómo se desarrolla la partida desde las sombras</p>
+          <Moon className="mx-auto mb-6 text-noir-smoke/20" size={64} />
+          <h2 className="text-3xl font-serif font-bold text-noir-smoke/40 tracking-[0.2em] uppercase mb-4">FALLECIDO</h2>
+          <p className="text-noir-smoke/30 font-serif italic">"Los muertos no cuentan cuentos."</p>
         </div>
       </div>
     );
@@ -90,13 +90,16 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
 
   if (hasSubmitted) {
     return (
-      <div className="min-h-screen bg-night-gradient p-4 flex items-center justify-center">
-        <div className="text-center max-w-md w-full bg-night-deep/70 border-2 border-night-moonlight/30 rounded-2xl p-8 shadow-lg">
-          <Moon className="mx-auto mb-4 text-night-moonlight drop-shadow-lg" size={48} />
-          <h2 className="text-2xl font-bold text-night-moonlight mb-2">Acción Confirmada</h2>
-          <p className="text-night-moonlight/80">Esperando a que los demás terminen...</p>
-          <div className="mt-6 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      <div className="min-h-screen bg-noir-bg p-4 flex items-center justify-center">
+        <div className="text-center max-w-md w-full p-8 border border-noir-gold/20 bg-noir-bg relative">
+          <div className="absolute inset-0 bg-noir-gold/5 blur-sm"></div>
+          <div className="relative z-10">
+            <Moon className="mx-auto mb-6 text-noir-gold" size={48} />
+            <h2 className="text-2xl font-serif font-bold text-noir-gold mb-2 tracking-[0.2em] uppercase">ACCIÓN REGISTRADA</h2>
+            <p className="text-noir-smoke font-serif italic">Esperando a que la noche termine...</p>
+            <div className="mt-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-noir-gold"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -104,32 +107,34 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
   }
 
   return (
-    <div className="min-h-screen bg-night-gradient p-4">
+    <div className="min-h-screen bg-noir-bg p-4">
       {/* Header */}
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-6">
-          <Moon className="mx-auto mb-3 text-night-moonlight drop-shadow-lg" size={48} />
-          <h1 className="text-3xl font-bold text-night-moonlight mb-2">🌙 Noche - Ronda {gameData.round}</h1>
-          <div className="mb-2 text-night-moonlight/80 font-mono text-xl">
-            Tiempo restante: {timeLeft}s
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8 border-b border-noir-gold/10 pb-6">
+          <Moon className="mx-auto mb-4 text-noir-gold" size={40} />
+          <h1 className="text-3xl font-serif font-bold text-noir-gold mb-2 tracking-[0.2em] text-glow">
+            NOCHE {gameData.round}
+          </h1>
+          <div className="mb-4 text-noir-smoke/50 font-mono text-sm tracking-widest">
+            {timeLeft}s RESTANTES
           </div>
-          <div className="inline-block px-4 py-2 bg-night-deep/70 border-2 border-night-moonlight/30 rounded-xl shadow-lg">
-            <span className="text-2xl mr-2">{myRole.emoji}</span>
-            <span className="text-lg font-bold text-night-moonlight">{myRole.name}</span>
+          <div className="inline-flex items-center gap-3 px-6 py-3 border border-noir-gold/30 bg-black/40 backdrop-blur-sm">
+            <span className="text-2xl filter grayscale opacity-80">{myRole.emoji}</span>
+            <span className="text-lg font-bold text-noir-gold uppercase tracking-wider">{myRole.name}</span>
           </div>
         </div>
 
         {/* Información de Mafia */}
         {myPlayer.side === 'mafia' && gameData.mafiaMembers && (
-          <div className="mb-6 p-4 bg-red-900/20 border-2 border-red-500/30 rounded-xl">
-            <h3 className="font-bold text-red-300 mb-2">🕴️ Compañeros de Mafia:</h3>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-8 p-6 bg-noir-blood/5 border border-noir-blood/30">
+            <h3 className="font-bold text-noir-blood mb-4 uppercase tracking-[0.2em] text-xs">LA FAMIGLIA</h3>
+            <div className="flex flex-wrap gap-3">
               {gameData.mafiaMembers
                 .filter(id => id !== myPlayerId)
                 .map(id => {
                   const member = gameData.players.find(p => p.id === id);
                   return member ? (
-                    <span key={id} className="px-3 py-1 bg-red-800/30 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                    <span key={id} className="px-3 py-1 bg-noir-blood/10 border border-noir-blood/30 text-noir-blood text-sm font-serif tracking-wide">
                       {member.name}
                     </span>
                   ) : null;
@@ -140,41 +145,43 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
 
         {/* Acción Nocturna */}
         {hasAction ? (
-          <div className="bg-night-deep/70 border-2 border-night-moonlight/30 rounded-2xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-night-moonlight mb-4">🗡️ Tu Acción en las Sombras</h2>
-            <p className="text-night-moonlight/80 mb-6">{myRole.description}</p>
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-serif font-bold text-noir-paper mb-2 tracking-wider">ELIGE TU OBJETIVO</h2>
+              <p className="text-noir-smoke/60 text-sm italic font-serif max-w-md mx-auto">{myRole.description}</p>
+            </div>
 
             {/* Opciones de mutilación para Carnicero */}
             {myRole.id === 'carnicero' && (
-              <div className="mb-4">
-                <label className="block text-night-moonlight font-bold mb-2">Tipo de mutilación:</label>
-                <div className="flex gap-3">
+              <div className="mb-6 border-t border-b border-noir-gold/10 py-4">
+                <label className="block text-noir-gold/50 font-bold mb-3 text-xs uppercase tracking-[0.2em] text-center">TIPO DE MUTILACIÓN</label>
+                <div className="flex gap-4">
                   <button
                     onClick={() => setMutationType('hand')}
-                    className={`flex-1 p-3 rounded-xl border-2 font-bold transition-all ${mutationType === 'hand'
-                      ? 'bg-torch-fire border-royal-gold text-white'
-                      : 'bg-night-shadow border-night-moonlight/30 text-night-moonlight/70'
+                    className={`flex-1 p-4 border transition-all uppercase tracking-widest text-sm font-bold ${mutationType === 'hand'
+                      ? 'bg-noir-blood text-black border-noir-blood'
+                      : 'bg-transparent border-noir-smoke/20 text-noir-smoke hover:border-noir-blood/50'
                       }`}
                   >
-                    ✋ Mano (no vota)
+                    ✋ MANO
                   </button>
                   <button
                     onClick={() => setMutationType('tongue')}
-                    className={`flex-1 p-3 rounded-xl border-2 font-bold transition-all ${mutationType === 'tongue'
-                      ? 'bg-torch-fire border-royal-gold text-white'
-                      : 'bg-night-shadow border-night-moonlight/30 text-night-moonlight/70'
+                    className={`flex-1 p-4 border transition-all uppercase tracking-widest text-sm font-bold ${mutationType === 'tongue'
+                      ? 'bg-noir-blood text-black border-noir-blood'
+                      : 'bg-transparent border-noir-smoke/20 text-noir-smoke hover:border-noir-blood/50'
                       }`}
                   >
-                    👅 Lengua (no habla)
+                    👅 LENGUA
                   </button>
                 </div>
               </div>
             )}
 
             {/* Selección de jugadores */}
-            <div className="space-y-2">
-              <label className="block text-night-moonlight font-bold mb-2">
-                {myRole.nightAction === 'swap' ? 'Selecciona DOS jugadores:' : 'Selecciona un jugador:'}
+            <div className="grid gap-3">
+              <label className="block text-noir-gold/50 font-bold mb-1 text-xs uppercase tracking-[0.2em] text-center">
+                {myRole.nightAction === 'swap' ? 'Selecciona DOS objetivos:' : 'Selecciona UN objetivo:'}
               </label>
               {eligiblePlayers.map(player => {
                 const isSelected = myRole.nightAction === 'swap'
@@ -198,46 +205,44 @@ const NightPhaseScreen = ({ gameData, myPlayerId, onSubmitAction }) => {
                         setSelectedTarget(player.id);
                       }
                     }}
-                    className={`w-full p-4 rounded-xl border-2 font-bold transition-all text-left ${isSelected
-                      ? 'bg-torch-fire border-royal-gold text-white shadow-lg'
-                      : 'bg-night-shadow border-night-moonlight/30 text-night-moonlight hover:border-torch-fire'
+                    className={`w-full p-4 border transition-all text-left flex items-center justify-between group ${isSelected
+                      ? 'bg-noir-gold text-black border-noir-gold'
+                      : 'bg-black/40 border-noir-gold/20 text-noir-paper hover:border-noir-gold hover:bg-white/5'
                       }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span>{player.name}</span>
-                        <div className="flex gap-1">
-                          {hasHandCut && <span title="Mano cortada">✋</span>}
-                          {hasTongueCut && <span title="Lengua cortada">👅</span>}
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`font-serif tracking-wider ${isSelected ? 'font-bold' : ''}`}>{player.name}</span>
+                      <div className="flex gap-1">
+                        {hasHandCut && <span title="Sin mano" className="opacity-50 grayscale">✋</span>}
+                        {hasTongueCut && <span title="Sin lengua" className="opacity-50 grayscale">👅</span>}
                       </div>
-                      {isSelected && <span>✅</span>}
                     </div>
+                    {isSelected && <div className="w-2 h-2 bg-black rounded-full animate-pulse" />}
                   </button>
                 );
               })}
             </div>
 
-            <div className="flex flex-col gap-3 mt-6">
+            <div className="flex flex-col gap-4 mt-8 pt-6 border-t border-noir-gold/10">
               <button
                 onClick={handleSubmit}
                 disabled={!canSubmit()}
-                className="w-full py-4 rounded-xl bg-torch-fire border-2 border-royal-gold text-white font-bold text-lg disabled:opacity-30 disabled:cursor-not-allowed hover:bg-royal-gold hover:text-medieval-ink transition-all shadow-lg"
+                className="w-full py-4 bg-noir-gold text-black font-bold uppercase tracking-[0.2em] hover:bg-white transition-all disabled:opacity-30 disabled:cursor-not-allowed text-sm"
               >
-                ⚔️ Confirmar Acción
+                CONFIRMAR ACCIÓN
               </button>
 
               <button
                 onClick={() => onSubmitAction({ type: 'no_action' })}
-                className="w-full p-4 bg-transparent border-2 border-night-moonlight/30 text-night-moonlight/70 rounded-xl font-bold hover:bg-night-moonlight/10 hover:text-night-moonlight transition-all"
+                className="w-full py-4 bg-transparent border border-noir-smoke/20 text-noir-smoke/50 font-bold uppercase tracking-[0.2em] hover:text-noir-smoke hover:border-noir-smoke transition-all text-xs"
               >
-                No realizar acción
+                OMITIR ACCIÓN
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-night-deep/70 border-2 border-night-moonlight/30 rounded-2xl p-6 text-center shadow-lg">
-            <p className="text-night-moonlight/80 text-lg">No tienes acción nocturna. Espera en las sombras a que amanezca...</p>
+          <div className="p-8 border border-noir-gold/10 bg-black/20 text-center">
+            <p className="text-noir-smoke/60 font-serif italic">No tienes asuntos esta noche. Permanece en las sombras.</p>
           </div>
         )}
       </div>

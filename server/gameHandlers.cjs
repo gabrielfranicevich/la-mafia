@@ -87,17 +87,95 @@ function setupGameHandlers(socket, roomManager) {
 
     // Enviar información personalizada a cada jugador
     room.players.forEach(player => {
-      // ...
+      const gamePlayer = gamePlayers.find(p => p.id === player.id);
+      if (gamePlayer) {
+        const personalizedGameData = {
+          ...room.gameData,
+          myRole: gamePlayer.role,
+          mySide: gamePlayer.side
+        };
+
+        roomManager.io.to(player.id).emit('gameStarted', personalizedGameData);
+      }
     });
+
+    console.log(`Game started in room ${roomId} with ${gamePlayers.length} players`);
   });
 
-  // ... (nightAction handler)
+  /**
+   * Recibir acción nocturna de un jugador
+   */
+  socket.on('nightAction', ({ roomId, action }) => {
+    const room = roomManager.getRoom(roomId);
+    if (!room || !room.gameData || room.gameData.phase !== 'night') {
+      socket.emit('actionError', { error: 'No es fase nocturna' });
+      return;
+    }
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) {
+      socket.emit('actionError', { error: 'Jugador no encontrado' });
+      return;
+    }
+
+    const gamePlayer = room.gameData.players.find(p => p.id === player.id);
+    if (!gamePlayer || !gamePlayer.alive) {
+      socket.emit('actionError', { error: 'No puedes realizar acciones' });
+      return;
+    }
+
+    // Validar acción
+    const validation = validateNightAction(action, gamePlayer, room.gameData);
+    if (!validation.valid) {
+      socket.emit('actionError', { error: validation.error });
+      return;
+    }
+
+    // Guardar acción
+    room.gameData.nightActions[player.id] = action;
+    socket.emit('actionReceived', { action });
+
+    // Verificar si todos los jugadores activos han enviado su acción
+    const playersWithActions = room.gameData.players.filter(p =>
+      p.alive && (p.role !== 'civil' || p.side === 'mafia')
+    );
+
+    roomManager.emitToRoom(roomId, 'nightProgress', {
+      received: Object.keys(room.gameData.nightActions).length,
+      total: playersWithActions.length
+    });
+
+    if (Object.keys(room.gameData.nightActions).length >= playersWithActions.length) {
+      resolveNight(room, roomManager);
+    }
+  });
 
   function resolveNight(room, roomManager) {
     if (room.timer) clearTimeout(room.timer); // Clear timer on resolution
 
     const { gameState, events } = resolveNightActions(room.gameData, room.gameData.nightActions);
-    // ...
+
+    // Actualizar gameData con el nuevo estado
+    room.gameData = gameState;
+    room.gameData.events = events;
+    room.gameData.nightActions = {}; // Reiniciar acciones
+
+    // Verificar condiciones de victoria
+    const victoryCheck = checkVictory(room.gameData);
+    if (victoryCheck.winner) {
+      room.gameData.winner = victoryCheck.winner;
+      room.gameData.winnerNames = getWinnerNames(room.gameData, victoryCheck.winner);
+      room.gameData.phase = 'results';
+      roomManager.emitToRoom(room.id, 'gameEnded', room.gameData);
+      return;
+    }
+
+    // Transición a fase diurna
+    room.gameData.phase = 'day';
+    room.gameData.previousPhase = 'night';
+
+    roomManager.emitToRoom(room.id, 'dayPhaseStart', room.gameData);
+    console.log(`Room ${room.id}: Night resolved, moving to day phase`);
   }
 
   socket.on('startVoting', ({ roomId }) => {

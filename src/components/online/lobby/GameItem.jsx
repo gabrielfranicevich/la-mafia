@@ -18,7 +18,7 @@ const GameItem = ({ game, onJoin }) => {
         <h3 className="font-serif font-bold text-lg text-noir-gold tracking-wider group-hover:text-white transition-colors">{game.name}</h3>
         <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-noir-smoke/60 mt-1">
           <span className="flex items-center gap-2">
-            <Users size={12} /> {game.players}/{game.maxPlayers === 2 ? '∞' : game.maxPlayers}
+            <Users size={12} /> {game.players}/{game.maxPlayers === 0 ? '∞' : game.maxPlayers}
           </span>
           <span className="flex items-center gap-2">
             {game.type === 'chat' ? <MessageSquare size={12} /> : <Users size={12} />}

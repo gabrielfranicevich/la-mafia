@@ -124,7 +124,7 @@ const OnlineLobbyScreen = ({ setScreen, onlineGames = [], lanGames = [],
             className="w-full py-4 border border-noir-gold/50 text-noir-gold font-serif font-bold tracking-[0.2em] hover:bg-noir-gold hover:text-noir-bg transition-all duration-300 uppercase flex items-center justify-center gap-4 bg-black/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
           >
             <Users size={20} />
-            CREATE ROOM
+            CREAR SALA
           </button>
         </>
       )}

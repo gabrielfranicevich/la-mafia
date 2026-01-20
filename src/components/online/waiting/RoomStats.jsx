@@ -10,7 +10,7 @@ const RoomStats = ({ currentPlayers, maxPlayers, gameType }) => (
       <div className="w-px h-6 bg-noir-gold/20"></div>
       <div className="flex items-center gap-3">
         {gameType === 'chat' ? <MessageSquare size={16} /> : <Users size={16} />}
-        <span className="uppercase text-xs tracking-[0.2em]">{gameType === 'chat' ? 'CHAT' : 'LIVE'}</span>
+        <span className="uppercase text-xs tracking-[0.2em]">{gameType === 'chat' ? 'CHAT' : 'EN PERSONA'}</span>
       </div>
     </div>
   </div>

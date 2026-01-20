@@ -30,13 +30,31 @@ class RoomManager {
       }));
   }
 
+  // Helper to safely serialize room data for clients
+  getPublicRoomData(room) {
+    if (!room) return null;
+    return {
+      id: room.id,
+      hostId: room.hostId,
+      hostPlayerId: room.hostPlayerId,
+      players: room.players,
+      roomName: room.roomName,
+      gameData: room.gameData,
+      status: room.status,
+      creatorPublicIp: room.creatorPublicIp,
+      creatorLocalIp: room.creatorLocalIp,
+      isPrivate: room.isPrivate,
+      settings: room.settings
+    };
+  }
+
   broadcastRoomList() {
     this.io.emit('roomList', this.getRoomsList());
   }
 
   broadcastRoomUpdate(roomId) {
     const room = this.rooms[roomId];
-    if (room) this.io.to(roomId).emit('roomUpdated', room);
+    if (room) this.io.to(roomId).emit('roomUpdated', this.getPublicRoomData(room));
   }
 
   emitToRoom(roomId, event, data) {
@@ -62,7 +80,7 @@ class RoomManager {
       contributedThemes: [],
       isPrivate: settings?.isPrivate || false,
       settings: {
-        players: Number(settings?.players) || 2,
+        players: settings?.players !== undefined ? Number(settings.players) : 4,
         type: settings?.type || 'in_person',
         roles: settings?.roles || 'standard',
         turn_time: Number(settings?.turn_time) || 10,
@@ -71,7 +89,7 @@ class RoomManager {
     };
 
     socket.join(roomId);
-    socket.emit('roomCreated', this.rooms[roomId]);
+    socket.emit('roomCreated', this.getPublicRoomData(this.rooms[roomId]));
     this.broadcastRoomList();
     console.log(`Room ${roomId} created by ${socket.id} (${safeName})`);
 
@@ -101,12 +119,12 @@ class RoomManager {
       existingPlayer.id = socket.id;
       existingPlayer.connected = true;
       socket.join(room.id);
-      socket.emit('roomJoined', room);
+      socket.emit('roomJoined', this.getPublicRoomData(room));
       this.broadcastRoomUpdate(room.id);
       return;
     }
 
-    if (room.players.length >= room.settings.players && room.settings.players !== 2) {
+    if (room.settings.players !== 0 && room.players.length >= room.settings.players) {
       socket.emit('error', 'Room is full');
       return;
     }

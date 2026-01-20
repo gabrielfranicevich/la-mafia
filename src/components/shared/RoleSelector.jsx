@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { Users, ChevronUp, ChevronDown, Plus, Minus } from '../Icons';
+import { memo, useState } from 'react';
+import { Users, ChevronUp, ChevronDown, Plus, Minus, X } from '../Icons';
 import { ROLES } from '../../data/gameRoles';
 
 /**
@@ -14,6 +14,8 @@ const RoleSelector = ({
   setExpanded,
   isHost = true
 }) => {
+  const [activeRoleInfo, setActiveRoleInfo] = useState(null);
+
   // Calcular roles asignados
   const assignedRoles = Object.values(selectedRoles).reduce((sum, count) => sum + count, 0);
   const civilsNeeded = Math.max(0, totalPlayers - assignedRoles);
@@ -27,7 +29,7 @@ const RoleSelector = ({
   const isValid = mafiaCount < civilCount;
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 relative">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-4 border-b border-noir-gold/20 hover:bg-white/5 transition-all group"
@@ -39,7 +41,7 @@ const RoleSelector = ({
           <div className="text-left">
             <h2 className="text-lg font-serif font-bold text-noir-gold leading-tight tracking-widest">ROLES</h2>
             <span className="text-xs text-noir-smoke font-bold uppercase tracking-wide">
-              {assignedRoles}/{totalPlayers} ASSIGNED
+              {assignedRoles}/{totalPlayers} ASIGNADOS
               {civilsNeeded > 0 && ` (+${civilsNeeded} CIVS)`}
             </span>
           </div>
@@ -52,7 +54,7 @@ const RoleSelector = ({
           {/* Validación */}
           {!isValid && (
             <div className="mb-4 p-3 border border-red-500/50 bg-red-900/20 rounded-sm text-red-200 text-xs font-bold tracking-wider">
-              ⚠️ MORE CIVILIANS THAN MAFIA REQUIRED
+              ⚠️ DEMASIADAS MAFIAS
             </div>
           )}
 
@@ -60,7 +62,7 @@ const RoleSelector = ({
           {civilsNeeded > 0 && (
             <div className="mb-4 p-3 border border-noir-gold/30 bg-noir-gold/5 rounded-sm">
               <div className="text-xs font-bold text-noir-gold tracking-wider">
-                👤 AUTO-ADDED: {civilsNeeded} CIVILIAN{civilsNeeded > 1 ? 'S' : ''}
+                👤 SE AGREGA{civilsNeeded > 1 ? 'N' : ''}: {civilsNeeded} CIVIL{civilsNeeded > 1 ? 'ES' : ''}
               </div>
             </div>
           )}
@@ -79,19 +81,52 @@ const RoleSelector = ({
                   role={role}
                   count={selectedRoles[role.id] || 0}
                   onIncrement={() => onUpdateRole(role.id, (selectedRoles[role.id] || 0) + 1)}
-                  onDecrement={() => onUpdateRole(role.id, Math.max(0, (selectedRoles[role.id] || 0) - 1))}
+                  onDecrement={() => onUpdateRole(role.id, Math.max(role.id === 'mafia' ? 1 : 0, (selectedRoles[role.id] || 0) - 1))}
                   disabled={!isHost}
                   isMaxReached={assignedRoles >= totalPlayers}
-                  canDecrement={(selectedRoles[role.id] || 0) > 0}
+                  canDecrement={role.id === 'mafia' ? (selectedRoles[role.id] || 0) > 1 : (selectedRoles[role.id] || 0) > 0}
+                  onShowInfo={() => setActiveRoleInfo(role)}
                 />
               ))}
           </div>
 
           {!isHost && (
             <div className="text-center text-xs text-noir-smoke/40 font-bold mt-4 italic tracking-widest">
-              WAITING FOR HOST CONFIGURATION...
+              ESPERANDO CONFIGURACIÓN...
             </div>
           )}
+        </div>
+      )}
+
+      {/* Role Info Modal */}
+      {activeRoleInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-medieval-parchment max-w-sm w-full rounded-xl border-2 border-noir-gold shadow-[0_0_30px_rgba(212,175,55,0.2)] p-6 relative">
+            <button
+              onClick={() => setActiveRoleInfo(null)}
+              className="absolute top-4 right-4 text-noir-deep/50 hover:text-noir-deep transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="text-6xl mb-4 animate-bounce-slow">
+                {activeRoleInfo.emoji}
+              </div>
+              <h3 className="text-2xl font-serif font-bold text-noir-deep mb-2 uppercase tracking-widest">
+                {activeRoleInfo.name}
+              </h3>
+              <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 ${activeRoleInfo.side === 'mafia' ? 'bg-red-900/20 text-red-700' :
+                activeRoleInfo.side === 'loco' ? 'bg-purple-900/20 text-purple-700' :
+                  'bg-blue-900/20 text-blue-700'
+                }`}>
+                {activeRoleInfo.side}
+              </div>
+              <p className="text-noir-deep/80 font-medium leading-relaxed">
+                {activeRoleInfo.description}
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -101,14 +136,26 @@ const RoleSelector = ({
 /**
  * Item individual de un rol
  */
-const RoleItem = ({ role, count, onIncrement, onDecrement, disabled, isMaxReached, canDecrement }) => {
+const RoleItem = ({ role, count, onIncrement, onDecrement, disabled, isMaxReached, canDecrement, onShowInfo }) => {
   return (
-    <div className="flex items-center gap-3 p-3 border border-noir-gold/10 hover:border-noir-gold/30 transition-colors bg-black/20">
-      <div className="text-2xl filter grayscale opacity-80">{role.emoji}</div>
-      <div className="flex-1 min-w-0">
-        <div className="font-serif font-bold text-noir-gold text-sm tracking-wider">{role.name}</div>
-        <div className="text-xs text-noir-smoke/60 truncate font-sans">{role.description}</div>
+    <div className="flex items-center gap-3 p-3 border border-noir-gold/10 hover:border-noir-gold/30 transition-colors bg-black/20 group">
+      <div
+        onClick={onShowInfo}
+        className="cursor-pointer flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity"
+      >
+        <div className="text-2xl filter grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
+          {role.emoji}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-serif font-bold text-noir-gold text-sm tracking-wider flex items-center gap-2">
+            {role.name}
+            <span className="text-[10px] text-noir-gold/40 border border-noir-gold/20 px-1 rounded hover:bg-noir-gold/10">
+              ?
+            </span>
+          </div>
+        </div>
       </div>
+
       <div className="flex items-center gap-2">
         <button
           onClick={onDecrement}

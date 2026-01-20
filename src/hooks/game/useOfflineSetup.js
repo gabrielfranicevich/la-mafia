@@ -4,12 +4,16 @@ import { SUSTANTIVOS, ADJETIVOS } from '../../data/names';
 
 export const useOfflineSetup = () => {
   // State - now for Mafia game (roles instead of themes/monos)
-  const [selectedRoles, setSelectedRoles] = useLocalStorage('mafia_setup_roles', {});
+  const [selectedRoles, setSelectedRoles] = useLocalStorage('mafia_setup_roles', { mafia: 1 });
   const [numPlayers, setNumPlayers] = useLocalStorage('mafia_setup_players', 4);
   const [playerNames, setPlayerNames] = useLocalStorage('mafia_setup_names', ['', '', '', '']);
 
   // Actions
   const toggleRole = useCallback((roleId, count) => {
+    // Ensure at least 1 mafia
+    if (roleId === 'mafia' && count < 1) {
+      return;
+    }
     setSelectedRoles(prev => ({
       ...prev,
       [roleId]: count

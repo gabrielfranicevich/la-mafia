@@ -11,35 +11,35 @@ const ResultsView = ({ gameData, roomData, isHost, onReset, onLeave }) => {
 
   // Determinar color del ganador
   const getWinnerColor = () => {
-    if (winner === 'civil') return 'bg-green-50 border-green-500 text-green-800';
-    if (winner === 'mafia') return 'bg-red-50 border-red-500 text-red-800';
-    if (winner === 'loco') return 'bg-purple-50 border-purple-500 text-purple-800';
-    return 'bg-gray-50 border-gray-500 text-gray-800';
+    if (winner === 'civil') return 'border-noir-gold text-noir-gold';
+    if (winner === 'mafia') return 'border-noir-blood text-noir-blood';
+    if (winner === 'loco') return 'border-purple-500 text-purple-500';
+    return 'border-noir-smoke text-noir-smoke';
   };
 
   const getWinnerTitle = () => {
-    if (winner === 'civil') return '✨ ¡GANARON LOS CIVILES!';
-    if (winner === 'mafia') return '🕴️ ¡GANÓ LA MAFIA!';
-    if (winner === 'loco') return '🤪 ¡GANÓ EL LOCO!';
-    return '🎮 FIN DEL JUEGO';
+    if (winner === 'civil') return 'LA JUSTICIA PREVALECE';
+    if (winner === 'mafia') return 'OMERTÀ PARA SIEMPRE';
+    if (winner === 'loco') return 'EL CAOS REINA';
+    return 'FIN DEL JUEGO';
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-noir-bg p-4 flex flex-col items-center">
+      <div className="max-w-3xl w-full">
         {/* Header de Victoria */}
-        <div className={`p-6 rounded-2xl mb-6 text-center border-4 ${getWinnerColor()}`}>
-          <Trophy className="mx-auto mb-4" size={64} />
-          <h2 className="text-3xl font-black uppercase mb-4">{getWinnerTitle()}</h2>
+        <div className={`p-8 mb-8 text-center border-y-4 bg-black/50 ${getWinnerColor()}`}>
+          <Trophy className="mx-auto mb-6 opacity-80" size={64} />
+          <h2 className="text-5xl font-serif font-black uppercase mb-6 tracking-[0.2em] text-glow">{getWinnerTitle()}</h2>
 
           {winnerNames.length > 0 && (
             <div>
-              <p className="text-lg font-bold mb-2">Ganadores:</p>
-              <div className="flex flex-wrap gap-2 justify-center">
+              <p className="text-xs uppercase tracking-[0.4em] mb-4 opacity-70">VENCEDORES</p>
+              <div className="flex flex-wrap gap-4 justify-center">
                 {winnerNames.map((name, idx) => (
                   <span
                     key={idx}
-                    className="px-4 py-2 bg-white/50 rounded-lg font-bold"
+                    className="px-6 py-2 border border-current bg-white/5 font-bold uppercase tracking-widest"
                   >
                     {name}
                   </span>
@@ -50,31 +50,27 @@ const ResultsView = ({ gameData, roomData, isHost, onReset, onLeave }) => {
         </div>
 
         {/* Revelación de Roles */}
-        <div className="bg-white/80 border-2 border-amber-300 rounded-2xl p-6 mb-6">
-          <h3 className="text-xl font-bold text-amber-900 mb-4">📜 Roles Revelados</h3>
-          <div className="space-y-2">
+        <div className="mb-8">
+          <h3 className="text-xs font-bold text-noir-gold/50 mb-4 uppercase tracking-[0.2em] text-center">EXPEDIENTE REVELADO</h3>
+          <div className="grid gap-2">
             {gameData.players.map((player) => {
               const role = ROLES[player.role];
               return (
                 <div
                   key={player.id}
-                  className={`flex items-center justify-between p-3 rounded-xl border-2 ${player.side === 'mafia'
-                    ? 'bg-red-50 border-red-300'
-                    : player.side === 'loco'
-                      ? 'bg-purple-50 border-purple-300'
-                      : 'bg-blue-50 border-blue-300'
+                  className={`flex items-center justify-between p-4 border-b border-noir-gold/10 ${player.side === 'mafia' ? 'bg-noir-blood/5' : 'bg-transparent'
                     }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{role?.emoji || '❓'}</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl filter grayscale opacity-70">{role?.emoji || '❓'}</span>
                     <div>
-                      <div className="font-bold">{player.name}</div>
-                      <div className="text-sm opacity-75">{role?.name || 'Desconocido'}</div>
+                      <div className="font-serif font-bold text-noir-paper uppercase tracking-wider">{player.name}</div>
+                      <div className="text-xs text-noir-smoke font-mono uppercase">{role?.name || 'Desconocido'}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    {!player.alive && <span className="text-red-600 font-bold">☠️ Muerto</span>}
-                    {player.alive && <span className="text-green-600 font-bold">✓ Vivo</span>}
+                    {!player.alive && <span className="text-noir-blood font-bold text-xs uppercase tracking-widest">☠️ FALLECIDO</span>}
+                    {player.alive && <span className="text-noir-gold/70 font-bold text-xs uppercase tracking-widest">SOBREVIVIENTE</span>}
                   </div>
                 </div>
               );
@@ -83,39 +79,39 @@ const ResultsView = ({ gameData, roomData, isHost, onReset, onLeave }) => {
         </div>
 
         {/* Estadísticas del Juego */}
-        <div className="bg-white/80 border-2 border-amber-300 rounded-2xl p-6 mb-6">
-          <h3 className="text-xl font-bold text-amber-900 mb-4">📊 Estadísticas</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-amber-50 rounded-xl">
-              <div className="text-3xl font-bold text-amber-900">{gameData.round}</div>
-              <div className="text-sm text-amber-700">Rondas</div>
+        <div className="mb-8 p-6 border border-noir-gold/20 bg-black/40">
+          <h3 className="text-xs font-bold text-noir-gold/50 mb-6 uppercase tracking-[0.2em] text-center">ESTADÍSTICAS DEL CASO</h3>
+          <div className="grid grid-cols-2 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-serif font-bold text-noir-paper">{gameData.round}</div>
+              <div className="text-xs text-noir-smoke uppercase tracking-widest mt-1">RONDAS</div>
             </div>
-            <div className="text-center p-3 bg-amber-50 rounded-xl">
-              <div className="text-3xl font-bold text-amber-900">
+            <div className="text-center">
+              <div className="text-4xl font-serif font-bold text-noir-blood">
                 {gameData.players.filter(p => !p.alive).length}
               </div>
-              <div className="text-sm text-amber-700">Muertes</div>
+              <div className="text-xs text-noir-smoke uppercase tracking-widest mt-1">BAJAS</div>
             </div>
           </div>
         </div>
 
         {/* Botones de Acción */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-4">
           {isHost && (
             <button
               onClick={onReset}
-              className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-amber-600 border-2 border-amber-800 text-white font-bold text-lg hover:bg-amber-700 transition-all shadow-lg"
+              className="flex-1 flex items-center justify-center gap-3 py-5 bg-noir-gold text-black font-bold uppercase tracking-[0.2em] hover:bg-white transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)]"
             >
-              <RotateCcw size={24} />
-              Jugar de Nuevo
+              <RotateCcw size={20} />
+              REPETIR
             </button>
           )}
           <button
             onClick={onLeave}
-            className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-gray-600 border-2 border-gray-800 text-white font-bold text-lg hover:bg-gray-700 transition-all shadow-lg"
+            className="flex-1 flex items-center justify-center gap-3 py-5 bg-transparent border border-noir-smoke/30 text-noir-smoke font-bold uppercase tracking-[0.2em] hover:bg-noir-smoke hover:text-black transition-all"
           >
-            <LogOut size={24} />
-            Salir
+            <LogOut size={20} />
+            SALIR
           </button>
         </div>
       </div>

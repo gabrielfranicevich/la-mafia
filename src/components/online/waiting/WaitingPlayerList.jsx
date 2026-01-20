@@ -1,6 +1,6 @@
 const WaitingPlayerList = ({ players, hostId }) => (
   <div className="flex-1 overflow-y-auto mb-6 px-1 scrollbar-thin scrollbar-thumb-noir-gold/50 scrollbar-track-transparent">
-    <h3 className="text-xs font-bold text-noir-gold/50 uppercase tracking-[0.2em] mb-3 ml-1">Connected Players</h3>
+    <h3 className="text-xs font-bold text-noir-gold/50 uppercase tracking-[0.2em] mb-3 ml-1">Jugadores</h3>
     <div className="space-y-2">
       {players.map((p, i) => (
         <div key={p.id} className="bg-white/5 p-3 flex items-center gap-4 border border-noir-gold/10 hover:border-noir-gold/30 transition-all">

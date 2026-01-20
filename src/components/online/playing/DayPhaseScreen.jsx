@@ -14,33 +14,36 @@ const DayPhaseScreen = ({ gameData, myPlayerId, onStartVoting, isHost }) => {
   const publicEvents = nightEvents.filter(e => !e.private || e.visibleTo?.includes(myPlayerId));
 
   return (
-    <div className="min-h-screen bg-day-gradient p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-noir-bg p-4 flex flex-col items-center">
+      <div className="max-w-2xl w-full">
         {/* Header */}
-        <div className="text-center mb-6">
-          <Sun className="mx-auto mb-3 text-day-sandstone drop-shadow-lg" size={48} />
-          <h1 className="text-3xl font-bold text-day-shadow mb-2">☀️ Día - Ronda {gameData.round}</h1>
-          <p className="text-day-shadow/80">La ciudad despierta. Es hora de debatir y decidir quién será juzgado</p>
+        <div className="text-center mb-8 border-b border-noir-gold/10 pb-6">
+          <Sun className="mx-auto mb-6 text-noir-gold" size={48} />
+          <h1 className="text-4xl font-serif font-bold text-noir-gold mb-2 tracking-[0.2em] text-glow">
+            DÍA {gameData.round}
+          </h1>
+          <p className="text-noir-smoke/60 font-serif italic text-sm">
+            "La verdad rara vez es pura y nunca simple."
+          </p>
         </div>
 
         {/* Eventos de la noche */}
         {publicEvents.length > 0 && (
-          <div className="mb-6 bg-day-warm-light/90 border-2 border-day-terracotta rounded-2xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-day-shadow mb-4">📰 El Pregonero Anuncia</h2>
-            <div className="space-y-2">
+          <div className="mb-8 bg-[#f5f5f5] text-black p-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] transform -rotate-1 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-black/80"></div>
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-black/80"></div>
+            <h2 className="text-3xl font-serif font-black text-center mb-6 uppercase tracking-wider border-b-2 border-black pb-2">
+              CRÓNICAS MATUTINAS
+            </h2>
+            <div className="space-y-4">
               {publicEvents.map((event, idx) => (
-                <div
-                  key={idx}
-                  className={`p-3 rounded-xl border-2 ${event.type === 'death'
-                    ? 'bg-red-50 border-red-400 text-red-900'
-                    : event.type === 'mutilate'
-                      ? 'bg-orange-100 border-orange-400 text-orange-900'
-                      : event.type === 'investigate'
-                        ? 'bg-blue-50 border-blue-400 text-blue-900'
-                        : 'bg-gray-50 border-gray-400 text-gray-900'
-                    }`}
-                >
-                  {event.message}
+                <div key={idx} className="border-b border-black/20 pb-2 last:border-0 last:pb-0">
+                  <h3 className="font-bold font-serif text-lg leading-tight mb-1 uppercase">
+                    {event.type === 'death' ? '¡TRAGEDIA!' : 'NOTICIAS'}
+                  </h3>
+                  <p className="font-serif text-sm leading-relaxed">
+                    {event.message}
+                  </p>
                 </div>
               ))}
             </div>
@@ -48,22 +51,24 @@ const DayPhaseScreen = ({ gameData, myPlayerId, onStartVoting, isHost }) => {
         )}
 
         {/* Jugadores vivos */}
-        <div className="mb-6 bg-day-warm-light/90 border-2 border-day-terracotta rounded-2xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold text-day-shadow mb-4">👥 Ciudadanos en la Plaza ({alivePlayers.length})</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="mb-8">
+          <h2 className="text-xs font-bold text-noir-gold/50 mb-4 uppercase tracking-[0.2em] text-center">SOSPECHOSOS ({alivePlayers.length})</h2>
+          <div className="grid grid-cols-2 gap-3">
             {alivePlayers.map(player => (
               <div
                 key={player.id}
-                className={`p-3 rounded-xl border-2 ${player.id === myPlayerId
-                  ? 'bg-day-sandstone/50 border-royal-gold shadow-md'
-                  : 'bg-white/80 border-day-terracotta/50'
+                className={`p-4 border transition-all ${player.id === myPlayerId
+                  ? 'bg-noir-gold text-black border-noir-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]'
+                  : 'bg-black/40 border-noir-gold/20 text-noir-paper'
                   }`}
               >
-                <div className="font-bold text-day-shadow">{player.name}</div>
-                <div className="text-xs text-day-shadow/70 space-x-2">
-                  {player.mutations?.includes('hand') && <span title="No puede votar">✋</span>}
-                  {player.mutations?.includes('tongue') && <span title="No puede hablar">👅</span>}
-                  {player.id === myPlayerId && <span>(Tú)</span>}
+                <div className="flex items-center justify-between mb-1">
+                  <div className={`font-serif font-bold uppercase tracking-wider ${player.id !== myPlayerId ? 'text-sm' : ''}`}>{player.name}</div>
+                  {player.id === myPlayerId && <span className="text-[10px] uppercase font-bold tracking-widest bg-black/20 px-1 rounded">TÚ</span>}
+                </div>
+                <div className="flex gap-2 text-xs opacity-70">
+                  {player.mutations?.includes('hand') && <span title="Sin mano" className="grayscale">✋ MANCO</span>}
+                  {player.mutations?.includes('tongue') && <span title="Silenciado" className="grayscale">👅 SILENCIADO</span>}
                 </div>
               </div>
             ))}
@@ -71,16 +76,15 @@ const DayPhaseScreen = ({ gameData, myPlayerId, onStartVoting, isHost }) => {
         </div>
 
         {/* Área de debate */}
-        <div className="mb-6 bg-day-warm-light/90 border-2 border-day-terracotta rounded-2xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold text-day-shadow mb-4">💬 Asamblea del Pueblo</h2>
+        <div className="mb-8 p-6 text-center border-y border-noir-gold/10 bg-black/20">
+          <h2 className="text-lg font-serif font-bold text-noir-gold mb-3 tracking-widest">DELIBERACIÓN</h2>
           {myPlayer?.alive && !myPlayer.mutations?.includes('tongue') ? (
-            <div className="text-center text-day-shadow/80 p-8 border-2 border-dashed border-day-terracotta/50 rounded-xl bg-white/30">
-              <p className="mb-2">Debate con los demás jugadores fuera de la aplicación</p>
-              <p className="text-sm opacity-75">(Chat de voz, presencial, etc.)</p>
+            <div className="text-noir-smoke/60 text-sm font-serif italic">
+              Discute la evidencia. Engaña o deduce.
             </div>
           ) : (
-            <div className="text-center text-red-700 p-8 border-2 border-dashed border-red-400 rounded-xl bg-red-50">
-              {!myPlayer?.alive ? '☠️ No puedes hablar (estás muerto)' : '👅 No puedes hablar (lengua mutilada)'}
+            <div className="text-noir-blood font-bold uppercase tracking-widest text-sm border p-2 border-noir-blood/30 inline-block">
+              {!myPlayer?.alive ? '☠️ FALLECIDO - SILENCIO' : '👅 LENGUA CORTADA - SILENCIO'}
             </div>
           )}
         </div>
@@ -89,9 +93,9 @@ const DayPhaseScreen = ({ gameData, myPlayerId, onStartVoting, isHost }) => {
         {isHost && (
           <button
             onClick={onStartVoting}
-            className="w-full py-4 rounded-xl bg-day-terracotta border-2 border-day-shadow text-white font-bold text-lg hover:bg-day-shadow transition-all shadow-lg"
+            className="w-full py-5 bg-noir-paper text-black font-serif font-black uppercase tracking-[0.2em] hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] text-lg"
           >
-            ⚖️ Iniciar Votación
+            ⚖️ INICIAR JUICIO
           </button>
         )}
       </div>

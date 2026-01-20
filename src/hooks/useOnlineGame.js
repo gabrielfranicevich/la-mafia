@@ -14,7 +14,7 @@ export const useOnlineGame = (setScreen, mySessionId, localIp, playerName) => {
   // Creation Settings
   const [newGameSettings, setNewGameSettings] = useState({
     name: '',
-    players: 2, // 2 = unlimited mode, shows as ∞ in UI
+    players: 0, // 0 = unlimited mode, shows as ∞ in UI
     type: 'in_person',
     isPrivate: false
   });
